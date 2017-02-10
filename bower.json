@@ -1,0 +1,11 @@
+{
+  "name": "bias-react",
+  "version": "0.0.1",
+  "dependencies": {
+    "jquery": "latest",
+    "d3": "3.x",
+    "fontawesome": "latest",
+    "materialize": "latest",
+    "x2js": "latest"
+  }
+}
