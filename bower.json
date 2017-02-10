@@ -6,6 +6,7 @@
     "d3": "3.x",
     "fontawesome": "latest",
     "materialize": "latest",
-    "x2js": "latest"
+    "x2js": "latest",
+    "axios": "latest"
   }
 }
