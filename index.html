@@ -191,9 +191,37 @@
 	}
 
 	function fetch_from_ids(ids, db){
+		// Split the IDs into lists of 100
+		var i, j, chunk = 100, urls = [];
+		for (i=0, j=ids.length; i<j; i+=chunk) {
+			var efetch_params = { rettype:  'abstract', retmode: 'xml', id: ids.slice(i, i+chunk).join(', '), db: db };
+			urls.push("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?" + $.param(efetch_params))
+		}
+		return axios.all(urls.map(function(url){
+				return axios.get(url)
+			})).then(function(results){
+				var all_results = [];
+				results.forEach(function(r){
+					var result = x2js.xml_str2json(r.data).PubmedArticleSet.PubmedArticle;
+					if (Array.isArray(result)){
+						result.forEach(function(a){
+							all_results.push(a);
+						});
+					} else {
+						all_results.push(result);
+					}
+				});
+				console.log(all_results)
+				return all_results;
+			}).then(function(articles){
+				return articles.map(function(a){
+					return parse_medline(a.MedlineCitation.Article, a.MedlineCitation.PMID);
+				});
+			});
+	}
+
+	function old_fetch_from_ids(ids, db){
 		// Set up the query and run it
-		var efetch_params = { rettype:  'abstract', retmode: 'xml', id: ids.join(', '), db: db };
-		var url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?" + $.param(efetch_params)
 		return axios.get(url).then(function(t){
 			var articles = x2js.xml_str2json(t.data).PubmedArticleSet.PubmedArticle;
 			if (Array.isArray(articles)){
