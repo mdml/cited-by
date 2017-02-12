@@ -3,11 +3,14 @@
 <meta charset="utf-8">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link rel="stylesheet" href="components/materialize/dist/css/materialize.min.css">
+<link rel="stylesheet" href="components/DataTables/media/css/dataTables.material.min.css">
 <script src="components/jquery/dist/jquery.min.js"></script>
 <script src="components/d3/d3.min.js" language="JavaScript"></script>
 <script src="components/materialize/dist/js/materialize.min.js"></script>
 <script src="components/x2js/xml2json.min.js"></script>
 <script src="components/axios/dist/axios.min.js"></script>
+<script src="components/DataTables/media/js/jquery.dataTables.min.js"></script>
+<script src="components/DataTables/media/js/dataTables.material.min.js"></script>
 <title>Cited by</title>
 </head>
 <body>
@@ -114,6 +117,7 @@
 	var db         = $('select#db'),
 		id         = $('input#id'),
 		tbl        = d3.select('div#citation-table table'),
+		dtbl       = $('div#citation-table table').DataTable({});
 		tbody      = tbl.select('tbody'),
 		title_el   = d3.select('div#ref a#title'),
 		authors_el = d3.select('div#ref div#authors'),
@@ -145,8 +149,8 @@
 						p.co_author_count = d3.sum(p.authors.map(function(a){ return author_set.has(a.toString()); }));
 					});
 
-
 					// Create a table listing all the papers citing this one
+					dtbl.destroy();
 					tbody.selectAll('*').remove();
 					var rows = tbody.selectAll('.tr')
 						.data(cited_by).enter()
@@ -176,6 +180,10 @@
 					ncite.text(cited_by.length);
 					nco.text(d3.sum(cited_by.map(function(p){ return p.co_author_count > 0; })));
 					nrev.text(d3.sum(cited_by.map(function(p){ return p.is_review === 'Review'; })));
+
+					// Turn into data table
+					dtbl = $('div#citation-table table').DataTable({lengthMenu: []});
+					$('select.form-control').parent().remove();
 				});
 			})
 
